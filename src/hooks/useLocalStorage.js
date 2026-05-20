@@ -1,6 +1,6 @@
 import { STORAGE_KEY, PREVIEW_ZOOM_KEY, FIELD_IDS, ZOOM_LEVELS } from '../utils/constants';
 
-export function saveData({ formData, sectionState, selectedTechs, selectedBadges }) {
+export function saveData({ formData, sectionState, selectedTechs, selectedBadges, sectionOrder }) {
   try {
     const data = {
       fields: { ...formData },
@@ -8,6 +8,7 @@ export function saveData({ formData, sectionState, selectedTechs, selectedBadges
       techs: Array.from(selectedTechs),
       badges: Array.from(selectedBadges),
       sections: { ...sectionState },
+      sectionOrder: sectionOrder || [],
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     return true;

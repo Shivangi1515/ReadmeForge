@@ -37,6 +37,15 @@ export function useReadmeState() {
     return defaults;
   });
 
+  const [sectionOrder, setSectionOrder] = useState(() => {
+    if (saved?.sectionOrder) {
+      const savedOrder = saved.sectionOrder.filter(id => SECTIONS.some(sec => sec.id === id));
+      const missing = SECTIONS.map(sec => sec.id).filter(id => !savedOrder.includes(id));
+      return [...savedOrder, ...missing];
+    }
+    return SECTIONS.map(sec => sec.id);
+  });
+
   const [selectedTechs, setSelectedTechs] = useState(() =>
     saved?.techs ? new Set(saved.techs) : new Set()
   );
@@ -50,10 +59,10 @@ export function useReadmeState() {
   const saveTimerRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
 
-  const scheduleSave = useCallback((fd, ss, st, sb) => {
+  const scheduleSave = useCallback((fd, ss, st, sb, so) => {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      saveData({ formData: fd, sectionState: ss, selectedTechs: st, selectedBadges: sb });
+      saveData({ formData: fd, sectionState: ss, selectedTechs: st, selectedBadges: sb, sectionOrder: so });
       setAutoSaved(true);
       clearTimeout(autoSaveTimerRef.current);
       autoSaveTimerRef.current = setTimeout(() => setAutoSaved(false), 2000);
@@ -63,36 +72,41 @@ export function useReadmeState() {
   const updateField = useCallback((field, value) => {
     setFormData(prev => {
       const next = { ...prev, [field]: value };
-      scheduleSave(next, sectionState, selectedTechs, selectedBadges);
+      scheduleSave(next, sectionState, selectedTechs, selectedBadges, sectionOrder);
       return next;
     });
-  }, [sectionState, selectedTechs, selectedBadges, scheduleSave]);
+  }, [sectionState, selectedTechs, selectedBadges, sectionOrder, scheduleSave]);
 
   const toggleSection = useCallback((id, checked) => {
     setSectionState(prev => {
       const next = { ...prev, [id]: checked };
-      scheduleSave(formData, next, selectedTechs, selectedBadges);
+      scheduleSave(formData, next, selectedTechs, selectedBadges, sectionOrder);
       return next;
     });
-  }, [formData, selectedTechs, selectedBadges, scheduleSave]);
+  }, [formData, selectedTechs, selectedBadges, sectionOrder, scheduleSave]);
+
+  const updateSectionOrder = useCallback((newOrder) => {
+    setSectionOrder(newOrder);
+    scheduleSave(formData, sectionState, selectedTechs, selectedBadges, newOrder);
+  }, [formData, sectionState, selectedTechs, selectedBadges, scheduleSave]);
 
   const toggleTech = useCallback((label) => {
     setSelectedTechs(prev => {
       const next = new Set(prev);
       if (next.has(label)) next.delete(label); else next.add(label);
-      scheduleSave(formData, sectionState, next, selectedBadges);
+      scheduleSave(formData, sectionState, next, selectedBadges, sectionOrder);
       return next;
     });
-  }, [formData, sectionState, selectedBadges, scheduleSave]);
+  }, [formData, sectionState, selectedBadges, sectionOrder, scheduleSave]);
 
   const toggleBadge = useCallback((id) => {
     setSelectedBadges(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
-      scheduleSave(formData, sectionState, selectedTechs, next);
+      scheduleSave(formData, sectionState, selectedTechs, next, sectionOrder);
       return next;
     });
-  }, [formData, sectionState, selectedTechs, scheduleSave]);
+  }, [formData, sectionState, selectedTechs, sectionOrder, scheduleSave]);
 
   const applyTemplate = useCallback((template) => {
     setFormData(prev => {
@@ -109,16 +123,17 @@ export function useReadmeState() {
         bibtexCitation: template.bibtexCitation || '',
       };
       const nextSections = { ...sectionState, academic: !!template.abstractText };
-      scheduleSave(next, nextSections, new Set(template.techs), selectedBadges);
+      scheduleSave(next, nextSections, new Set(template.techs), selectedBadges, sectionOrder);
       return next;
     });
     setSectionState(prev => ({ ...prev, academic: !!template.abstractText }));
     setSelectedTechs(new Set(template.techs));
-  }, [sectionState, selectedBadges, scheduleSave]);
+  }, [sectionState, selectedBadges, sectionOrder, scheduleSave]);
 
   const resetAll = useCallback(() => {
     setFormData(initialFormData);
     setSectionState(buildDefaultSectionState());
+    setSectionOrder(SECTIONS.map(sec => sec.id));
     setSelectedTechs(new Set());
     setSelectedBadges(new Set(DEFAULT_BADGES));
     setScreenshots([]);
@@ -147,6 +162,7 @@ export function useReadmeState() {
   return {
     formData, updateField,
     sectionState, toggleSection,
+    sectionOrder, updateSectionOrder,
     selectedTechs, toggleTech,
     selectedBadges, toggleBadge,
     screenshots, addScreenshots, removeScreenshot,

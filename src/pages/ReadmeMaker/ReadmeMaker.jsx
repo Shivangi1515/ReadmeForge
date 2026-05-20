@@ -16,6 +16,7 @@ export default function ReadmeMaker() {
   const {
     formData, updateField,
     sectionState, toggleSection,
+    sectionOrder, updateSectionOrder,
     selectedTechs, toggleTech,
     selectedBadges, toggleBadge,
     screenshots, addScreenshots, removeScreenshot,
@@ -26,8 +27,8 @@ export default function ReadmeMaker() {
   const [activeTemplate, setActiveTemplate] = useState(null);
 
   const currentMd = useMemo(() =>
-    generateMarkdown({ formData, sectionState, selectedTechs, selectedBadges, screenshots }),
-    [formData, sectionState, selectedTechs, selectedBadges, screenshots]
+    generateMarkdown({ formData, sectionState, selectedTechs, selectedBadges, screenshots, sectionOrder }),
+    [formData, sectionState, selectedTechs, selectedBadges, screenshots, sectionOrder]
   );
 
   const activeSectionCount = Object.values(sectionState).filter(Boolean).length;
@@ -89,6 +90,8 @@ export default function ReadmeMaker() {
           <Sidebar
             sectionState={sectionState}
             toggleSection={toggleSection}
+            sectionOrder={sectionOrder}
+            updateSectionOrder={updateSectionOrder}
             selectedTechs={selectedTechs}
             toggleTech={toggleTech}
             applyTemplate={handleApplyTemplate}
