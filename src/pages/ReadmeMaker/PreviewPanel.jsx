@@ -51,6 +51,7 @@ function calculateQuality({ formData, sectionState, selectedTechs, screenshots }
 
 export default function PreviewPanel({ currentMd, formData, sectionState, selectedTechs, screenshots }) {
   const toast = useToast();
+  const [copied, setCopied] = useState(false);
   const [tab, setTabState] = useState('rendered');
   const [zoom, setZoom] = useState(() => {
     try {
@@ -102,13 +103,22 @@ export default function PreviewPanel({ currentMd, formData, sectionState, select
     try {
       await navigator.clipboard.writeText(currentMd);
       toast('✓ Copied to clipboard!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
       const ta = document.createElement('textarea');
       ta.value = currentMd;
       ta.style.cssText = 'position:absolute;left:-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); toast('✓ Copied!'); } catch { toast('Copy failed'); }
+      try {
+        document.execCommand('copy');
+        toast('✓ Copied!');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast('Copy failed');
+      }
       document.body.removeChild(ta);
     }
   }, [currentMd, toast]);
@@ -158,11 +168,22 @@ export default function PreviewPanel({ currentMd, formData, sectionState, select
             <button className="pbtn" onClick={zoomIn} disabled={zoom >= ZOOM_LEVELS[ZOOM_LEVELS.length - 1]} title="Zoom in (Ctrl +)">+</button>
             <button className="pbtn" onClick={() => setZoom(1)} title="Reset zoom (Ctrl 0)">Reset</button>
           </div>
-          <button className="pbtn green" onClick={copyMarkdown}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-            </svg>
-            Copy Markdown
+          <button className={`pbtn green${copied ? ' copied' : ''}`} onClick={copyMarkdown}>
+            {copied ? (
+              <>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Copied!
+              </>
+            ) : (
+              <>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+                Copy Markdown
+              </>
+            )}
           </button>
           <button className="pbtn" onClick={downloadMd}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -256,11 +277,47 @@ export default function PreviewPanel({ currentMd, formData, sectionState, select
             </div>
           </div>
         ) : tab === 'rendered' ? (
-          <div className="preview-zoom-wrap">
+          <div className="preview-zoom-wrap" style={{ position: 'relative' }}>
+            <button className={`copy-floating-btn${copied ? ' copied' : ''}`} onClick={copyMarkdown} title="Copy README Markdown">
+              {copied ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                  </svg>
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
             <div className="gh-preview" dangerouslySetInnerHTML={{ __html: md2html(currentMd) }} />
           </div>
         ) : (
-          <div className="preview-zoom-wrap">
+          <div className="preview-zoom-wrap" style={{ position: 'relative' }}>
+            <button className={`copy-floating-btn${copied ? ' copied' : ''}`} onClick={copyMarkdown} title="Copy README Markdown">
+              {copied ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                  </svg>
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
             <div className="raw-view">{currentMd}</div>
           </div>
         )}

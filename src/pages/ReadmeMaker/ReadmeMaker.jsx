@@ -12,6 +12,7 @@ import { useState } from 'react';
 
 export default function ReadmeMaker() {
   const toast = useToast();
+  const [copied, setCopied] = useState(false);
 
   const {
     formData, updateField,
@@ -41,7 +42,11 @@ export default function ReadmeMaker() {
   function handleCopyMarkdown() {
     if (!currentMd) { toast('Generate content first!'); return; }
     navigator.clipboard.writeText(currentMd)
-      .then(() => toast('✓ Copied to clipboard!'))
+      .then(() => {
+        toast('✓ Copied to clipboard!');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
       .catch(() => toast('Copy failed'));
   }
 
@@ -81,7 +86,9 @@ export default function ReadmeMaker() {
             </a>
             <button className="hbtn" onClick={handleClearSaved}>🗑 Clear Saved</button>
             <button className="hbtn" onClick={handleResetAll}>↺ Reset All Fields</button>
-            <button className="hbtn" onClick={handleCopyMarkdown}>Copy Markdown</button>
+            <button className={`hbtn${copied ? ' copied' : ''}`} onClick={handleCopyMarkdown}>
+              {copied ? '✓ Copied!' : 'Copy Markdown'}
+            </button>
           </div>
         </header>
 
