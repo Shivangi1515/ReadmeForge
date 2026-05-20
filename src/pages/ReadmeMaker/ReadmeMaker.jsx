@@ -93,6 +93,8 @@ export default function ReadmeMaker() {
             toggleTech={toggleTech}
             applyTemplate={handleApplyTemplate}
             activeTemplate={activeTemplate}
+            formData={formData}
+            screenshots={screenshots}
           />
           <EditorPanel
             formData={formData}

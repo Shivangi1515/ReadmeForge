@@ -308,3 +308,59 @@ export function getWordCount(text) {
   if (!text) return 0;
   return text.trim().split(/\s+/).filter(w => w && w !== '###' && w !== '-').length;
 }
+
+export function calculateProgress({ formData, sectionState, selectedTechs, screenshots }) {
+  const isFilled = (id) => {
+    if (!sectionState[id]) return false;
+    switch (id) {
+      case 'title':
+        return !!formData.projName?.trim();
+      case 'description':
+        return !!formData.description?.trim();
+      case 'features':
+        return !!formData.features?.trim();
+      case 'techstack':
+        return selectedTechs?.size > 0 || !!formData.customTech?.trim();
+      case 'installation':
+        return !!formData.installCmds?.trim() || !!formData.usageCmd?.trim();
+      case 'structure':
+        return !!formData.rawStructure?.trim();
+      case 'screenshots':
+        return (screenshots && screenshots.length > 0) || !!formData.imageUrls?.trim() || !!formData.videoUrl?.trim();
+      case 'api':
+        return !!formData.apiDocs?.trim();
+      case 'contributing':
+        return true;
+      case 'author':
+        return !!formData.authorName?.trim() || !!formData.authorGh?.trim();
+      case 'support':
+        return !!formData.supportMsg?.trim() || !!formData.supportBmac?.trim() || !!formData.supportKofi?.trim() || !!formData.supportPatreon?.trim() || !!formData.supportGhSponsors?.trim();
+      case 'academic':
+        return !!formData.abstractText?.trim() || !!formData.paperLink?.trim();
+      default:
+        return false;
+    }
+  };
+
+  const coreSections = ['title', 'description', 'techstack', 'installation', 'author'];
+  const optionalSections = ['features', 'structure', 'screenshots', 'api', 'contributing', 'academic', 'support'];
+
+  let coreScore = 0;
+  coreSections.forEach(id => {
+    if (isFilled(id)) coreScore += 15;
+  });
+
+  let optionalScore = 0;
+  optionalSections.forEach(id => {
+    if (isFilled(id)) optionalScore += 5;
+  });
+  optionalScore = Math.min(25, optionalScore);
+
+  const totalProgress = coreScore + optionalScore;
+  const missingCore = coreSections.filter(id => !isFilled(id));
+
+  return {
+    percentage: totalProgress,
+    missingCore,
+  };
+}

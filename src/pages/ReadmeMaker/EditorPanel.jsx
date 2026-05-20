@@ -14,10 +14,10 @@ function WordCount({ text }) {
   );
 }
 
-function EditorSection({ num, title, badge, hidden, children }) {
+function EditorSection({ id, num, title, badge, hidden, children }) {
   if (hidden) return null;
   return (
-    <div className="editor-section">
+    <div className="editor-section" id={id}>
       <div className="es-header">
         <div className="es-num">{num}</div>
         <div className="es-title">{title}</div>
@@ -61,7 +61,7 @@ export default function EditorPanel({
     <div className="editor">
       <div className="editor-inner" id="editorInner">
 
-        <EditorSection num={1} title="Project Title & Badges" hidden={!sectionState.title}>
+        <EditorSection id="editor-section-title" num={1} title="Project Title & Badges" hidden={!sectionState.title}>
           <div className="two-col">
             <div>
               <label>PROJECT NAME *</label>
@@ -102,7 +102,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={2} title="Description" hidden={!sectionState.description}>
+        <EditorSection id="editor-section-description" num={2} title="Description" hidden={!sectionState.description}>
           <div>
             <label>SHORT DESCRIPTION</label>
             <textarea className="textInput" id="description" style={{ minHeight: 90 }}
@@ -121,7 +121,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num="3A" title="Academic / Research Details" hidden={!sectionState.academic}>
+        <EditorSection id="editor-section-academic" num="3A" title="Academic / Research Details" hidden={!sectionState.academic}>
           <div>
             <label>ABSTRACT</label>
             <textarea className="textInput" id="abstractText" style={{ minHeight: 100 }}
@@ -157,7 +157,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={3} title="Features" hidden={!sectionState.features}>
+        <EditorSection id="editor-section-features" num={3} title="Features" hidden={!sectionState.features}>
           <div>
             <label>KEY FEATURES — use "### Category" for groups, "- item" for bullets</label>
             <textarea className="textInput" id="features" style={{ minHeight: 130 }}
@@ -168,6 +168,7 @@ export default function EditorPanel({
         </EditorSection>
 
         <EditorSection
+          id="editor-section-techstack"
           num={4} title="Tech Stack" hidden={!sectionState.techstack}
           badge={techCount > 0 ? `${techCount} selected` : undefined}
         >
@@ -192,7 +193,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={5} title="Installation" hidden={!sectionState.installation}>
+        <EditorSection id="editor-section-installation" num={5} title="Installation" hidden={!sectionState.installation}>
           <div>
             <label>PREREQUISITES</label>
             <input type="text" id="prereqs" placeholder="Python 3.10+, Node.js 18+"
@@ -221,7 +222,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={7} title="Project Structure Visualizer" hidden={!sectionState.structure}>
+        <EditorSection id="editor-section-structure" num={7} title="Project Structure Visualizer" hidden={!sectionState.structure}>
           <div>
             <label>PASTE YOUR FOLDER STRUCTURE (indented with spaces)</label>
             <textarea className="textInput" id="rawStructure" style={{ minHeight: 120 }}
@@ -235,7 +236,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={8} title="Screenshots" hidden={!sectionState.screenshots}>
+        <EditorSection id="editor-section-screenshots" num={8} title="Screenshots" hidden={!sectionState.screenshots}>
           <div>
             <label>LIVE DEMO / VIDEO LINK (optional)</label>
             <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=..."
@@ -286,7 +287,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={9} title="API Documentation" hidden={!sectionState.api}>
+        <EditorSection id="editor-section-api" num={9} title="API Documentation" hidden={!sectionState.api}>
           <div>
             <label>API ENDPOINTS — format: METHOD /path | Description (one per line)</label>
             <textarea className="textInput" id="apiDocs" style={{ minHeight: 100 }}
@@ -301,7 +302,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={10} title="Contributing" hidden={!sectionState.contributing}>
+        <EditorSection id="editor-section-contributing" num={10} title="Contributing" hidden={!sectionState.contributing}>
           <div>
             <label>CUSTOM CONTRIBUTING NOTES (optional — default guide auto-generated)</label>
             <textarea className="textInput" id="contribNotes" style={{ minHeight: 70 }}
@@ -311,7 +312,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={11} title="License & Author" hidden={!sectionState.author}>
+        <EditorSection id="editor-section-author" num={11} title="License & Author" hidden={!sectionState.author}>
           <div className="two-col">
             <div>
               <label>LICENSE</label>
@@ -366,7 +367,7 @@ export default function EditorPanel({
           </div>
         </EditorSection>
 
-        <EditorSection num={12} title="Support & Donation" hidden={!sectionState.support}>
+        <EditorSection id="editor-section-support" num={12} title="Support & Donation" hidden={!sectionState.support}>
           <div>
             <label>SUPPORT MESSAGE (optional)</label>
             <textarea className="textInput" id="supportMsg" style={{ minHeight: 60 }}
