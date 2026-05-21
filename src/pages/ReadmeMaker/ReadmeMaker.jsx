@@ -14,7 +14,7 @@ export default function ReadmeMaker() {
   const toast = useToast();
 
   const {
-    formData, updateField,
+    formData, updateField, updateMultipleFields,
     sectionState, toggleSection,
     selectedTechs, toggleTech,
     selectedBadges, toggleBadge,
@@ -24,6 +24,30 @@ export default function ReadmeMaker() {
   } = useReadmeState();
 
   const [activeTemplate, setActiveTemplate] = useState(null);
+
+  function handleGitHubImport(data) {
+    const fieldsToUpdate = {};
+    if (data.name) {
+      fieldsToUpdate.projName = data.name;
+      fieldsToUpdate.repoSlug = data.name;
+    }
+    if (data.description) {
+      fieldsToUpdate.tagline = data.description;
+      fieldsToUpdate.description = data.description;
+    }
+    if (data.owner) {
+      fieldsToUpdate.ghUser = data.owner;
+      fieldsToUpdate.authorGh = data.owner;
+    }
+    if (data.license) {
+      fieldsToUpdate.license = data.license;
+    }
+    if (data.homepage) {
+      fieldsToUpdate.demoUrl = data.homepage;
+    }
+    updateMultipleFields(fieldsToUpdate);
+    toast('✓ GitHub repository data imported!');
+  }
 
   const currentMd = useMemo(() =>
     generateMarkdown({ formData, sectionState, selectedTechs, selectedBadges, screenshots }),
@@ -105,6 +129,7 @@ export default function ReadmeMaker() {
             screenshots={screenshots}
             addScreenshots={addScreenshots}
             removeScreenshot={removeScreenshot}
+            onGitHubImport={handleGitHubImport}
           />
           <PreviewPanel
             currentMd={currentMd}

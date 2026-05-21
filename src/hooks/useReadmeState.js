@@ -68,6 +68,14 @@ export function useReadmeState() {
     });
   }, [sectionState, selectedTechs, selectedBadges, scheduleSave]);
 
+  const updateMultipleFields = useCallback((fieldsObj) => {
+    setFormData(prev => {
+      const next = { ...prev, ...fieldsObj };
+      scheduleSave(next, sectionState, selectedTechs, selectedBadges);
+      return next;
+    });
+  }, [sectionState, selectedTechs, selectedBadges, scheduleSave]);
+
   const toggleSection = useCallback((id, checked) => {
     setSectionState(prev => {
       const next = { ...prev, [id]: checked };
@@ -145,7 +153,7 @@ export function useReadmeState() {
   }, []);
 
   return {
-    formData, updateField,
+    formData, updateField, updateMultipleFields,
     sectionState, toggleSection,
     selectedTechs, toggleTech,
     selectedBadges, toggleBadge,
